@@ -22,11 +22,11 @@ def get_site_map(sitemap_url):
     for monthly_url in monthly_list:
         print("-------------------------------------------")
         print("getting monthly news ", i, " of", len(monthly_list))
-        get_monthly_news(monthly_url)
+        get_monthly_news(monthly_url, i)
         i = i+1
 
 
-def get_monthly_news(url):
+def get_monthly_news(url, i):
     response = requests.get(url)
     response_xml_as_string = response.content.decode('utf-8', errors="replace")
     soup = BeautifulSoup(response_xml_as_string, 'xml')
@@ -36,25 +36,27 @@ def get_monthly_news(url):
 
     start = url.find('monthly-')
     end = url.find('.xml', start)
-    filename = url[start:end]
+    date = url[start:end]
 
     for url_tag in soup.find_all('loc'):
         if "jpg" in url_tag.contents[0]:
             continue
         else:
-            monthly_df = monthly_df.append(pd.DataFrame({'Url': url_tag.contents[0], 'Parent': filename}, index=[0]), ignore_index=True)
+            monthly_df = monthly_df.append(pd.DataFrame({'Url': url_tag.contents[0],'Date':date}, index=[0]), ignore_index=True)
+            # monthly_df['Month'] = date
             monthly_news_list.append(url_tag.contents[0])
 
     all_news_list.append(monthly_news_list)
     print(monthly_news_list)
     print("Number of Total Monthly Articles ", len(monthly_news_list))
-    save_url_csv(monthly_df, filename)
+    save_url_csv(monthly_df, i)
 
 
-def save_url_csv(dataframe, filename):
+def save_url_csv(dataframe, i):
+    root = "sitemap"
     print(dataframe.head())
-    filename = "thairath_news_" + filename + ".csv"
-    dataframe.to_csv("sitemap" + '/' + filename, sep='\t', encoding='utf-8')
+    filename = "thairath_news_" + str(i) + ".csv"
+    dataframe.to_csv(root + '/' + filename, index=False, encoding='utf-8')
 
 
 get_site_map("https://www.thairath.co.th/sitemap.xml")

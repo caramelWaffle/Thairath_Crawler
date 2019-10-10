@@ -42,7 +42,6 @@ def get_monthly_news(url):
     all_news_list.append(monthly_news_list)
     print(monthly_news_list)
     print("Number of Total Monthly Articles ", len(monthly_news_list))
-    save_url_csv()
 
 
 def save_url_csv():

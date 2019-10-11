@@ -1,8 +1,8 @@
 import os
 import glob
 import pandas as pd
-#set working directory
-os.chdir("E:\Khun Projects\Thairath_Crawler\sitemap")
+
+os.chdir("\sitemap")
 
 #find all csv files in the folder
 #use glob pattern matching -> extension = 'csv'

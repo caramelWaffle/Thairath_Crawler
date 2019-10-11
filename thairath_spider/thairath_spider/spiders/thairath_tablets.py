@@ -1,15 +1,30 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from scrapy import Request
+
+from ..items import ThairathSpiderItem
 
 
 class ThairathTabletsSpider(scrapy.Spider):
     name = 'thairath_tablets'
     allowed_domains = ['thairath.co.th']
-    start_urls = ['https://www.thairath.co.th/news/politic/1680358/']
+    # start_urls = ['https://www.thairath.co.th/news/crime/1672393']
+
+    start_urls = [
+        'https://www.thairath.co.th/news/politic/1507875',
+        'https://www.thairath.co.th/news/local/east/1507891',
+        'https://www.thairath.co.th/news/politic/1507830'
+    ]
+
+    def make_requests_from_url(self, url):
+        return Request(url, dont_filter=True, meta={
+            'dont_redirect': True,
+            'handle_httpstatus_list': [301, 302]
+        })
 
     def parse(self, response):
-        print("procesing:"+response.url)
-        self.log("procesing:"+response.url)
+        print("procesing:" + response.url)
+        self.log("procesing:" + response.url)
         # Extract data using css selectors
         # Get Title
         title = response.css(".e1ui9xgn0::text").extract()
@@ -23,21 +38,10 @@ class ThairathTabletsSpider(scrapy.Spider):
         # Get Tags
         tags = response.css(".evs3ejl16 a::text").extract()
 
-        row_data = zip(title, summary, body, tags)
+        items = ThairathSpiderItem()
+        items['title'] = title
+        items['summary'] = summary
+        items['body'] = body
+        items['tags'] = tags
 
-        print(summary)
-
-        # Making extracted data row wise
-        for item in row_data:
-            # create a dictionary to store the scraped info
-            scraped_info = {
-                # key:value
-                'page': response.url,
-                'title': item[0],
-                # item[0] means product in the list and so on, index tells what value to assign
-                'summary': item[1],
-                'body': item[2],
-                'tags': item[3],
-            }
-            # yield or give the scraped info to scrapy
-            yield scraped_info
+        yield items

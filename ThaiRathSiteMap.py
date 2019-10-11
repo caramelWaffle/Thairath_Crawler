@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 all_news_list = list()
 
 
-def get_site_map(sitemap_url):
+def get_site_map(sitemap_url, start_at):
     monthly_list = list()
     response = requests.get(sitemap_url)
     response_xml_as_string = response.content.decode('utf-8', errors="replace")
@@ -18,12 +18,11 @@ def get_site_map(sitemap_url):
             monthly_list.append(url_tag.contents[0])
 
     print("Total month : ", len(monthly_list))
-    i = 1
-    for monthly_url in monthly_list:
+
+    for x in range(start_at, len(monthly_list)):
         print("-------------------------------------------")
-        print("getting monthly news ", i, " of", len(monthly_list))
-        get_monthly_news(monthly_url, i)
-        i = i+1
+        print("getting monthly news ", x, " of", len(monthly_list))
+        get_monthly_news(monthly_list[x], x)
 
 
 def get_monthly_news(url, i):
@@ -59,5 +58,5 @@ def save_url_csv(dataframe, i):
     dataframe.to_csv(root + '/' + filename, index=False, encoding='utf-8')
 
 
-get_site_map("https://www.thairath.co.th/sitemap.xml")
+get_site_map("https://www.thairath.co.th/sitemap.xml", 40)
 

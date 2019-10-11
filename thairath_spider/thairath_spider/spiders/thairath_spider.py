@@ -1,20 +1,28 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy import Request
+from scrapy.crawler import CrawlerProcess
 
 from ..items import ThairathSpiderItem
+import os
+import glob
+import pandas as pd
 
+path = "/Users/macintoshhd/Thairath_Crawler/test_dataset/"
+file_name = "test_dataset_"   # Change here 1 (first time)
 
 class ThairathTabletsSpider(scrapy.Spider):
-    name = 'thairath_tablets'
+    start_index = 2   # Change here 2 (every time)
+    name = 'thairath_spider'
     allowed_domains = ['thairath.co.th']
-    # start_urls = ['https://www.thairath.co.th/news/crime/1672393']
+    os.chdir(path)
+    extension = '.csv'
+    # all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
+    # all_filenames.sort()
+    file_name = file_name + str(start_index) + extension
+    data = pd.read_csv(path+file_name)
+    start_urls = data["Url"].values
 
-    start_urls = [
-        'https://www.thairath.co.th/news/politic/1507875',
-        'https://www.thairath.co.th/news/local/east/1507891',
-        'https://www.thairath.co.th/news/politic/1507830'
-    ]
 
     def make_requests_from_url(self, url):
         return Request(url, dont_filter=True, meta={
@@ -30,10 +38,10 @@ class ThairathTabletsSpider(scrapy.Spider):
         title = response.css(".e1ui9xgn0::text").extract()
 
         # Get Summary
-        summary = response.css(".evs3ejl35 p::text").extract()
+        summary = response.css(".evs3ejl35 p::text,.evs3ejl35 p strong::text,.evs3ejl35 strong::text").extract()
 
         # Get Body
-        body = response.css("div p::text").extract()
+        body = response.css("div p::text, div p strong::text, div strong::text").extract()
 
         # Get Tags
         tags = response.css(".evs3ejl16 a::text").extract()

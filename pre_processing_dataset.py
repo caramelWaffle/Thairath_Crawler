@@ -13,6 +13,7 @@ def contact_list(list):
 
 def cleaning(path_, file_name_):
     df = pd.read_json(path_ + '/' + file_name_ + '.json', encoding='utf8')
+    # df = df[['title', 'body', 'summary', 'tags']]
     summary_list = []
     body_list = []
     title_list = []
@@ -49,7 +50,7 @@ def cleaning(path_, file_name_):
         row['summary'][0] = row['summary'][0].replace("...", "")
 
         for x in range(0, len(row['body'])):
-            row['body'][x] = row['body'][0].replace("อ่านข่าวที่เกี่ยวข้อง", "")
+            row['body'][x] = row['body'][x].replace("อ่านข่าวที่เกี่ยวข้อง", "")
 
         title_list.append(contact_list(row['title']))
         body_list.append(contact_list(row['body']))
@@ -68,14 +69,24 @@ def cleaning(path_, file_name_):
     for index, row in df.iterrows():
         print(index, "\n", row['title'], "\n", row['summary'], "\n", row['body'], "\n", row['tags'])
 
-    df.to_csv("cleaned_"+file_name+".csv", index=False, encoding='utf-8-sig')
+    subdirectory = "cleaned_csv"
+    try:
+        os.mkdir(subdirectory)
+    except Exception:
+        pass
 
+    # with open(os.path.join(subdirectory, ip.strip() + ".txt"), "a") as ip_file:
+    # with open(os.path.join(subdirectory,"cleaned_" + file_name + ".json"), 'w', encoding='utf-8') as file:
+    #     df.to_json(file, force_ascii=False)
+
+    # df.to_json(os.path.join(subdirectory, "cleaned_" + file_name + ".json"), orient='records', lines=True, force_ascii=False)
+    df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name_ + ".csv"), index=False, encoding='utf-8-sig', columns = ["title", "body", "summary", "tags"])
 
 # START HERE
 path = "E:/Khun Projects/Thairath_Crawler/test_dataset"
 os.chdir(path)
 all_filenames = [i for i in glob.glob('*.{}'.format("json"))]
-all_filenames.sort()
+sorted(all_filenames)
 k = 1
 for file_name in all_filenames:
     print("Cleaning ", k, " of ", len(all_filenames))

@@ -8,6 +8,7 @@ from pythainlp import word_tokenize
 def contact_list(list):
     string = ''.join(list)
     re.sub('[^A-Za-z0-9]+', '', string)
+    string = " ".join(string.split())
     return string
 
 
@@ -38,11 +39,10 @@ def cleaning(path_, file_name_):
             df.drop(index, inplace=True)
             continue
 
-        if "สรุปข่าว" in contact_list(row['tags']):
-            df.drop(index, inplace=True)
-            continue
-
-        if "ดวง" in contact_list(row['tags']):
+        if "ดวง" in contact_list(row['tags']) \
+                or "นิยาย" in contact_list(row['tags']) \
+                or "อินสตราแกรมดารา" in contact_list(row['tags']) \
+                or "สรุปข่าว" in contact_list(row['tags']):
             df.drop(index, inplace=True)
             continue
 
@@ -80,7 +80,9 @@ def cleaning(path_, file_name_):
     #     df.to_json(file, force_ascii=False)
 
     # df.to_json(os.path.join(subdirectory, "cleaned_" + file_name + ".json"), orient='records', lines=True, force_ascii=False)
-    df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name_ + ".csv"), index=False, encoding='utf-8-sig', columns = ["title", "body", "summary", "tags"])
+    df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name_ + ".csv"), index=False, encoding='utf-8-sig',
+              columns=["title", "body", "summary", "tags"])
+
 
 # START HERE
 path = "E:/Khun Projects/Thairath_Crawler/test_dataset"

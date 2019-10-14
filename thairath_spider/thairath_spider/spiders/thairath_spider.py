@@ -8,11 +8,11 @@ import os
 import glob
 import pandas as pd
 
-path = "/Users/macintoshhd/Thairath_Crawler/test_dataset/"
-file_name = "test_dataset_"   # Change here 1 (first time)
+path = "/Users/macintoshhd/Thairath_Crawler/sitemap/"
+file_name = "combined_csv"   # Change here 1 (first time)
 
 class ThairathTabletsSpider(scrapy.Spider):
-    start_index = 2   # Change here 2 (every time)
+    start_index = "16-35"   # Change here 2 (every time)
     name = 'thairath_spider'
     allowed_domains = ['thairath.co.th']
     os.chdir(path)

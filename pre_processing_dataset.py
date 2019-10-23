@@ -31,7 +31,7 @@ def cleaning(path_, file_name_):
             df.drop(index, inplace=True)
             continue
 
-        if len(word_tokenize(contact_list(row['body']), engine='newmm', keep_whitespace=False)) <= 150:
+        if len(word_tokenize(contact_list(row['body']), engine='newmm', keep_whitespace=False)) <= 250:
             df.drop(index, inplace=True)
             continue
 
@@ -42,6 +42,10 @@ def cleaning(path_, file_name_):
         if "ดวง" in contact_list(row['tags']) \
                 or "นิยาย" in contact_list(row['tags']) \
                 or "อินสตราแกรมดารา" in contact_list(row['tags']) \
+                or "คอลัมน์ฉบับพิมพ์" in contact_list(row['tags']) \
+                or "คอลัมน์ไทยรัฐ" in contact_list(row['tags']) \
+                or "คอลัมน์" in contact_list(row['tags']) \
+                or "คลิปสุดฮา" in contact_list(row['tags']) \
                 or "สรุปข่าว" in contact_list(row['tags']):
             df.drop(index, inplace=True)
             continue
@@ -51,6 +55,9 @@ def cleaning(path_, file_name_):
 
         for x in range(0, len(row['body'])):
             row['body'][x] = row['body'][x].replace("อ่านข่าวที่เกี่ยวข้อง", "")
+
+        for x in range(0, len(row['title'])):
+            row['title'][x] = row['title'][x].replace("ชมคลิป", "")
 
         title_list.append(contact_list(row['title']))
         body_list.append(contact_list(row['body']))
@@ -74,18 +81,12 @@ def cleaning(path_, file_name_):
         os.mkdir(subdirectory)
     except Exception:
         pass
-
-    # with open(os.path.join(subdirectory, ip.strip() + ".txt"), "a") as ip_file:
-    # with open(os.path.join(subdirectory,"cleaned_" + file_name + ".json"), 'w', encoding='utf-8') as file:
-    #     df.to_json(file, force_ascii=False)
-
-    # df.to_json(os.path.join(subdirectory, "cleaned_" + file_name + ".json"), orient='records', lines=True, force_ascii=False)
     df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name_ + ".csv"), index=False, encoding='utf-8-sig',
               columns=["title", "body", "summary", "tags"])
 
 
 # START HERE
-path = "E:\Khun Projects\Thairath_Crawler\\test_dataset"
+path = "/Users/macintoshhd/Thairath_Crawler/test_dataset"
 os.chdir(path)
 all_filenames = [i for i in glob.glob('*.{}'.format("json"))]
 sorted(all_filenames)

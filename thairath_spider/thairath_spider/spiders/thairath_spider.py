@@ -8,11 +8,11 @@ import os
 import glob
 import pandas as pd
 
-path = "/Users/macintoshhd/Thairath_Crawler/sitemap/"
+path = "E:\Khun Projects\Thairath_Crawler\sitemap"
 file_name = "combined_csv"   # Change here 1 (first time)
 
 class ThairathTabletsSpider(scrapy.Spider):
-    start_index = "16-35"   # Change here 2 (every time)
+    start_index = "16-23"   # Change here 2 (every time)
     name = 'thairath_spider'
     allowed_domains = ['thairath.co.th']
     os.chdir(path)
@@ -20,7 +20,7 @@ class ThairathTabletsSpider(scrapy.Spider):
     # all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
     # all_filenames.sort()
     file_name = file_name + str(start_index) + extension
-    data = pd.read_csv(path+file_name)
+    data = pd.read_csv(path+'\\'+file_name)
     start_urls = data["Url"].values
 
 

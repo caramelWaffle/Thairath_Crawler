@@ -85,7 +85,7 @@ def cleaning(path_, file_name_):
 
 
 # START HERE
-path = "E:/Khun Projects/Thairath_Crawler/test_dataset"
+path = "E:\Khun Projects\Thairath_Crawler\\test_dataset"
 os.chdir(path)
 all_filenames = [i for i in glob.glob('*.{}'.format("json"))]
 sorted(all_filenames)

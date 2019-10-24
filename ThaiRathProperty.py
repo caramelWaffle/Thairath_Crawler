@@ -41,7 +41,7 @@ for index, row in thairath_df.iterrows():
         if summary not in article_set:
             ab_score = ab_score + 1
 
-    abstract_percent = (ab_score * 100)/len(article_set)
+    abstract_percent = (ab_score * 100)/len(summary_set)
     thairath_df.loc[index, 'abstractedness'] = abstract_percent
 
     print("\n =======================================================")

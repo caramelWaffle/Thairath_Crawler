@@ -19,7 +19,7 @@ def get_site_map(sitemap_url, start_at):
 
     print("Total month : ", len(monthly_list))
 
-    for x in range(start_at, len(monthly_list)):
+    for x in range(start_at-1, len(monthly_list)):
         print("-------------------------------------------")
         print("getting monthly news ", x, " of", len(monthly_list))
         get_monthly_news(monthly_list[x], x)
@@ -58,5 +58,5 @@ def save_url_csv(dataframe, i):
     dataframe.to_csv(root + '/' + filename, index=False, encoding='utf-8')
 
 
-get_site_map("https://www.thairath.co.th/sitemap.xml", 40)
+get_site_map("https://www.thairath.co.th/sitemap.xml", 1)
 

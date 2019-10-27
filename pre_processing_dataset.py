@@ -12,9 +12,12 @@ def contact_list(list):
     return string
 
 
-def cleaning(path_, file_name_):
-    df = pd.read_json(path_ + '/' + file_name_ + '.json', encoding='utf8')
-    # df = df[['title', 'body', 'summary', 'tags']]
+def cleaning(path_, file_name_, format_):
+    if format_ == ".json":
+        df = pd.read_json(path_ + '/' + file_name_ + format_, encoding='utf-8')
+    else:
+        df = pd.read_csv(path_ + '/' + file_name_ + format_, encoding='utf-8')
+
     summary_list = []
     body_list = []
     title_list = []
@@ -31,7 +34,11 @@ def cleaning(path_, file_name_):
             df.drop(index, inplace=True)
             continue
 
-        if len(word_tokenize(contact_list(row['body']), engine='newmm', keep_whitespace=False)) <= 250:
+        if len(word_tokenize(contact_list(row['body']), engine='newmm', keep_whitespace=False)) <= 230:
+            df.drop(index, inplace=True)
+            continue
+
+        if len(word_tokenize(contact_list(row['summary']), engine='newmm', keep_whitespace=False)) < 8:
             df.drop(index, inplace=True)
             continue
 
@@ -42,22 +49,61 @@ def cleaning(path_, file_name_):
         if "ดวง" in contact_list(row['tags']) \
                 or "นิยาย" in contact_list(row['tags']) \
                 or "อินสตราแกรมดารา" in contact_list(row['tags']) \
-                or "คอลัมน์ฉบับพิมพ์" in contact_list(row['tags']) \
-                or "คอลัมน์ไทยรัฐ" in contact_list(row['tags']) \
-                or "คอลัมน์" in contact_list(row['tags']) \
                 or "คลิปสุดฮา" in contact_list(row['tags']) \
                 or "สรุปข่าว" in contact_list(row['tags']):
             df.drop(index, inplace=True)
             continue
 
-        row['body'].remove(row['summary'][0])
-        row['summary'][0] = row['summary'][0].replace("...", "")
+        for x in range(0, len(row['summary'])):
+            row['body'].remove(row['summary'][x])
+            row['summary'][x] = row['summary'][x].replace("‘", "")
+            row['summary'][x] = row['summary'][x].replace("’", "")
+            row['summary'][x] = row['summary'][x].replace("“", "")
+            row['summary'][x] = row['summary'][x].replace("”", "")
+            row['summary'][x] = row['summary'][x].replace("!", "")
+            row['summary'][x] = row['summary'][x].replace("\"", "")
+            row['summary'][x] = row['summary'][x].replace("\'", "")
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '..'), None))
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '...'), None))
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '....'), None))
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '....'), None))
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '"'), None))
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '\"'), None))
+            row['summary'][x] = row['summary'][x].translate(dict.fromkeys(map(ord, '!'), None))
 
         for x in range(0, len(row['body'])):
             row['body'][x] = row['body'][x].replace("อ่านข่าวที่เกี่ยวข้อง", "")
+            row['body'][x] = row['body'][x].replace("‘", "")
+            row['body'][x] = row['body'][x].replace("’", "")
+            row['body'][x] = row['body'][x].replace("“", "")
+            row['body'][x] = row['body'][x].replace("”", "")
+            row['body'][x] = row['body'][x].replace("!", "")
+            row['body'][x] = row['body'][x].replace("\"", "")
+            row['body'][x] = row['body'][x].replace("\'", "")
+            row['body'][x] = row['body'][x].replace("•", "")
+            row['body'][x] = row['body'][x].replace("\u200b", "")
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, '..'), None))
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, '...'), None))
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, '....'), None))
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, '"'), None))
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, '\"'), None))
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, '•'), None))
+            row['body'][x] = row['body'][x].translate(dict.fromkeys(map(ord, 'u200b'), None))
+
+
 
         for x in range(0, len(row['title'])):
             row['title'][x] = row['title'][x].replace("ชมคลิป", "")
+            row['title'][x] = row['title'][x].replace("‘", "")
+            row['title'][x] = row['title'][x].replace("’", "")
+            row['title'][x] = row['title'][x].replace("“", "")
+            row['title'][x] = row['title'][x].replace("”", "")
+            row['title'][x] = row['title'][x].replace("\'", "")
+            row['title'][x] = row['title'][x].replace("\"", "")
+            row['title'][x] = row['title'][x].replace("!", "")
+            row['title'][x] = row['title'][x].translate(dict.fromkeys(map(ord, '..'), None))
+            row['title'][x] = row['title'][x].translate(dict.fromkeys(map(ord, '...'), None))
+            row['title'][x] = row['title'][x].translate(dict.fromkeys(map(ord, '....'), None))
 
         title_list.append(contact_list(row['title']))
         body_list.append(contact_list(row['body']))
@@ -65,16 +111,11 @@ def cleaning(path_, file_name_):
 
     del df['summary']
     del df['body']
-    del df['title']
+    # del df['title']
 
     df['summary'] = summary_list
     df['body'] = body_list
-    df['title'] = title_list
-
-    print("\nAfter pre-processing")
-
-    for index, row in df.iterrows():
-        print(index, "\n", row['title'], "\n", row['summary'], "\n", row['body'], "\n", row['tags'])
+    # df['title'] = title_list
 
     subdirectory = "cleaned_csv"
     try:
@@ -82,12 +123,14 @@ def cleaning(path_, file_name_):
     except Exception:
         pass
     df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name_ + ".csv"), index=False, encoding='utf-8-sig',
-              columns=["title", "body", "summary", "tags"])
+              columns=["body", "summary"])
 
 
 # START HERE
-path = "/Users/macintoshhd/Thairath_Crawler/test_dataset"
+path = "E:\\Khun Projects\\Thairath_Crawler\\detail"
 os.chdir(path)
+# cleaning(path, "cleaned_thairath_detail_test_200", ".csv")
+
 all_filenames = [i for i in glob.glob('*.{}'.format("json"))]
 sorted(all_filenames)
 k = 1

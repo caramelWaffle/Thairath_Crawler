@@ -2,9 +2,6 @@ import pythainlp
 import pandas as pd
 import os
 
-path = 'detail/cleaned_csv/cleaned_thairath-201k_statistic.csv'
-thairath_df = pd.read_csv(path, encoding='utf-8')
-
 
 def get_abstractedness_score(article_set, summary_set):
     ab_score = 0
@@ -19,6 +16,20 @@ def generate_ngrams(tokens, n):
     return ["".join(ngram) for ngram in ngrams]
 
 
+def human_format(num):
+    magnitude = 0
+    while abs(num) >= 1000:
+        magnitude += 1
+        num /= 1000.0
+    # add more suffixes if you need them
+    return '%d%s' % (num, ['', 'K', 'M', 'G', 'T', 'P'][magnitude])
+
+
+path = '/Users/macintoshhd/Thairath_Crawler/test_dataset/'
+file_name = 'test_data200'
+thairath_df = pd.read_csv(path+file_name+'.csv', encoding='utf-8')
+
+df_size = len(thairath_df)
 for index, row in thairath_df.iterrows():
 
     article_token = pythainlp.word_tokenize(row['body'], engine='newmm', keep_whitespace=False)
@@ -30,6 +41,7 @@ for index, row in thairath_df.iterrows():
     thairath_df.loc[index, 'abstractedness_n1'] = get_abstractedness_score(set(article_token), set(summary_token))
 
     if thairath_df.loc[index, 'abstractedness_n1'] >= 50:
+        thairath_df.drop(index, inplace=True)
         continue
 
     thairath_df.loc[index, 'abstractedness_n2'] = get_abstractedness_score(set(generate_ngrams(article_token, 2)),
@@ -40,13 +52,13 @@ for index, row in thairath_df.iterrows():
                                                                            set(generate_ngrams(summary_token, 4)))
     thairath_df.loc[index, 'abstractedness_n5'] = get_abstractedness_score(set(generate_ngrams(article_token, 5)),
                                                                            set(generate_ngrams(summary_token, 5)))
-    percent = (index * 100) / len(thairath_df)
-    print(index+1, " of ", len(thairath_df), " || ", percent, "%")
+    percent = (index * 100) / df_size
+    print(index+1, " of ", df_size, " || ", percent, "%")
 
 article_avg_size = thairath_df['article_length'].mean()
 summary_avg_size = thairath_df['summary_length'].mean()
 
-abstract_avg_size = thairath_df['abstractedness'].mean()
+abstract_avg_size = thairath_df['abstractedness_n1'].mean()
 abstract_avg_size_2 = thairath_df['abstractedness_n2'].mean()
 abstract_avg_size_3 = thairath_df['abstractedness_n3'].mean()
 abstract_avg_size_4 = thairath_df['abstractedness_n4'].mean()
@@ -64,12 +76,21 @@ print("Abstract_5_avg_size : ", abstract_avg_size_5)
 
 
 subdirectory = "detail"
-file_name_ = "thairath-201k-statistic"
+
+file = open("thairath-"+human_format(len(thairath_df))+".txt", "w+")
+file.write("Dataset size : " + str(len(thairath_df)))
+file.write("\nArticle_avg_size : " + str(article_avg_size))
+file.write("\nSummary_avg_size : " + str(summary_avg_size))
+file.write("\nAbstract_2_avg_size : " + str(abstract_avg_size_2))
+file.write("\nAbstract_3_avg_size : " + str(abstract_avg_size_3))
+file.write("\nAbstract_4_avg_size : " + str(abstract_avg_size_4))
+file.write("\nAbstract_5_avg_size : " + str(abstract_avg_size_5))
+file.close()
 
 try:
     os.mkdir(subdirectory)
 except FileExistsError:
     pass
-thairath_df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name_ + ".csv"), index=False, encoding='utf-8-sig',
+thairath_df.to_csv(os.path.join(subdirectory, "cleaned_" + file_name + ".csv"), index=False, encoding='utf-8-sig',
                    columns=["body", "summary", "article_length", "summary_length", "abstractedness_n1",
                             "abstractedness_n2", "abstractedness_n3", "abstractedness_n4", "abstractedness_n5"])

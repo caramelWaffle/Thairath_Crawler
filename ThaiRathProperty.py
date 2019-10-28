@@ -2,7 +2,7 @@ import pythainlp
 import pandas as pd
 import os
 
-path = "/Users/macintoshhd/Thairath_Crawler/test_10.csv"
+path = 'detail/cleaned_csv/cleaned_thairath-201k_statistic.csv'
 thairath_df = pd.read_csv(path, encoding='utf-8')
 
 
@@ -20,6 +20,7 @@ def generate_ngrams(tokens, n):
 
 
 for index, row in thairath_df.iterrows():
+
     article_token = pythainlp.word_tokenize(row['body'], engine='newmm', keep_whitespace=False)
     summary_token = pythainlp.word_tokenize(row['summary'], engine='newmm', keep_whitespace=False)
 
@@ -27,6 +28,10 @@ for index, row in thairath_df.iterrows():
     thairath_df.loc[index, 'summary_length'] = len(summary_token)
 
     thairath_df.loc[index, 'abstractedness_n1'] = get_abstractedness_score(set(article_token), set(summary_token))
+
+    if thairath_df.loc[index, 'abstractedness_n1'] >= 50:
+        continue
+
     thairath_df.loc[index, 'abstractedness_n2'] = get_abstractedness_score(set(generate_ngrams(article_token, 2)),
                                                                            set(generate_ngrams(summary_token, 2)))
     thairath_df.loc[index, 'abstractedness_n3'] = get_abstractedness_score(set(generate_ngrams(article_token, 3)),
@@ -59,7 +64,7 @@ print("Abstract_5_avg_size : ", abstract_avg_size_5)
 
 
 subdirectory = "detail"
-file_name_ = "test_10-statistic"
+file_name_ = "thairath-201k-statistic"
 
 try:
     os.mkdir(subdirectory)

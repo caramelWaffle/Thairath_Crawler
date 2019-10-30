@@ -34,9 +34,11 @@ for index, row in thairath_df.iterrows():
 
     article_token = pythainlp.word_tokenize(row['body'], engine='newmm', keep_whitespace=False)
     summary_token = pythainlp.word_tokenize(row['summary'], engine='newmm', keep_whitespace=False)
+    title_token = pythainlp.word_tokenize(row['title'], engine='newmm', keep_whitespace=False)
 
     thairath_df.loc[index, 'article_length'] = len(article_token)
     thairath_df.loc[index, 'summary_length'] = len(summary_token)
+    thairath_df.loc[index, 'title_length'] = len(title_token)
 
     thairath_df.loc[index, 'abstractedness_n1'] = get_abstractedness_score(set(article_token), set(summary_token))
 
@@ -57,6 +59,7 @@ for index, row in thairath_df.iterrows():
 
 article_avg_size = thairath_df['article_length'].mean()
 summary_avg_size = thairath_df['summary_length'].mean()
+title_avg_size = thairath_df['title_length'].mean()
 
 abstract_avg_size = thairath_df['abstractedness_n1'].mean()
 abstract_avg_size_2 = thairath_df['abstractedness_n2'].mean()
@@ -65,6 +68,7 @@ abstract_avg_size_4 = thairath_df['abstractedness_n4'].mean()
 abstract_avg_size_5 = thairath_df['abstractedness_n5'].mean()
 
 print("\nDataset size : ", len(thairath_df))
+print("Title_avg_size : ", title_avg_size)
 print("Article_avg_size : ", article_avg_size)
 print("Summary_avg_size : ", summary_avg_size)
 
@@ -79,6 +83,7 @@ subdirectory = "detail"
 
 file = open("thairath-"+human_format(len(thairath_df))+".txt", "w+")
 file.write("Dataset size : " + str(len(thairath_df)))
+file.write("\nTitle_avg_size : " + str(title_avg_size))
 file.write("\nArticle_avg_size : " + str(article_avg_size))
 file.write("\nSummary_avg_size : " + str(summary_avg_size))
 file.write("\nAbstract_2_avg_size : " + str(abstract_avg_size_2))

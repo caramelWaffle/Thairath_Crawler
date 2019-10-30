@@ -1,13 +1,11 @@
 import glob
 import os
 import pandas as pd
-import re
 from pythainlp import word_tokenize
 
 
 def contact_list(list):
     string = ''.join(list)
-    # re.sub('[^A-Za-z0-9]+', '', string)
     string = " ".join(string.split())
     return string
 

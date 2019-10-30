@@ -1,5 +1,7 @@
 import pythainlp
 import pandas as pd
+import pickle
+import os
 
 def contact_list(list):
     string = ''.join(list)
@@ -10,8 +12,10 @@ def contact_list(list):
 path = '/Users/macintoshhd/Thairath_Crawler/test_dataset/'
 file_name = 'test_data200'
 thairath_df = pd.read_csv(path+file_name+'.csv', encoding='utf-8')
-
+pickle_name = "vocab.pkl"
+pickle_unique_name = "vocab_unique.pkl"
 df_size = len(thairath_df)
+os.chdir(path)
 
 for index, row in thairath_df.iterrows():
     title_token = pythainlp.word_tokenize(row['title'], engine='newmm', keep_whitespace=False)
@@ -20,16 +24,31 @@ for index, row in thairath_df.iterrows():
     tag_token = pythainlp.word_tokenize(contact_list(row['tags']), engine='newmm', keep_whitespace=False)
 
     thairath_df.loc[index, 'title_length'] = len(title_token)
+    all_token = set(title_token + article_token + summary_token)
+
+    with open(pickle_name, 'ab') as file:
+        pickle.dump(list(all_token), file)
+    all_token.clear()
+
     percent = (index * 100) / df_size
-    print(index + 1, " of ", df_size, " || ", percent, "%")
+    print("Tokenization - [step 1 of 2 ] ", index + 1, " of ", df_size, " || ", percent, "%")
 
-summary_avg_size = thairath_df['title_length'].mean()
+vocab_set = set()
+with open(pickle_name, 'rb') as file:
+    for i in range(df_size):
+        vocab_set.update(pickle.load(file))
+        percent = ((i+1) * 100) / df_size
+        print("Uniquify Token - [step 2 of 2 ] ", i + 1, " of ", df_size, " || ", percent, "%")
 
-print("\nAvg of title size : ", summary_avg_size)
+with open(pickle_unique_name, 'wb') as file:
+    print("Saving unique vocab...")
+    pickle.dump(list(vocab_set), file)
+    file.close()
 
+print("Writing result...")
+file = open("vocab_item.txt", "w+")
+file.write(str(vocab_set))
+file.close()
 
-
-
-
-
-
+print("\nVocab size : ", len(vocab_set))
+print("File detailed at ", path, pickle_unique_name)

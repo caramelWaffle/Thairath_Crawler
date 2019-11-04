@@ -9,10 +9,11 @@ import glob
 import pandas as pd
 
 path = "E:\Khun Projects\Thairath_Crawler\sitemap"
-file_name = "combined_csv"   # Change here 1 (first time)
+file_name = "thairath_news_"  # Change here 1 (first time)
+
 
 class ThairathTabletsSpider(scrapy.Spider):
-    start_index = "16-23"   # Change here 2 (every time)
+    start_index = "0"  # Change here 2 (every time)
     name = 'thairath_spider'
     allowed_domains = ['thairath.co.th']
     os.chdir(path)
@@ -20,9 +21,8 @@ class ThairathTabletsSpider(scrapy.Spider):
     # all_filenames = [i for i in glob.glob('*.{}'.format(extension))]
     # all_filenames.sort()
     file_name = file_name + str(start_index) + extension
-    data = pd.read_csv(path+'\\'+file_name)
+    data = pd.read_csv(path + '\\' + file_name)
     start_urls = data["Url"].values
-
 
     def make_requests_from_url(self, url):
         return Request(url, dont_filter=True, meta={

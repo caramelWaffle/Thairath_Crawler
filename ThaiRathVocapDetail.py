@@ -3,17 +3,19 @@ import pandas as pd
 import pickle
 import os
 
+
 def contact_list(list):
     string = ''.join(list)
     string = " ".join(string.split())
     return string
 
 
-path = '/Users/macintoshhd/Thairath_Crawler/test_dataset/'
-file_name = 'test_data200'
+path = 'E:\\Khun Projects\\Thairath_Crawler\\detail\\'
+file_name = 'thairath-228k'
 thairath_df = pd.read_csv(path+file_name+'.csv', encoding='utf-8')
 pickle_name = "vocab.pkl"
 pickle_unique_name = "vocab_unique.pkl"
+local_file = "vocab_item.txt"
 df_size = len(thairath_df)
 os.chdir(path)
 
@@ -46,9 +48,9 @@ with open(pickle_unique_name, 'wb') as file:
     file.close()
 
 print("Writing result...")
-file = open("vocab_item.txt", "w+")
+file = open(local_file, "w+", encoding="utf-8")
 file.write(str(vocab_set))
 file.close()
 
 print("\nVocab size : ", len(vocab_set))
-print("File detailed at ", path, pickle_unique_name)
+print("File detailed at ", path, local_file)

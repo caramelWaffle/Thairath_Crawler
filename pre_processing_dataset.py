@@ -119,6 +119,9 @@ def cleaning(path_, file_name_, format_):
             row['tags'][x] = row['tags'][x].translate(dict.fromkeys(map(ord, '\"'), None))
             row['tags'][x] = row['tags'][x].translate(dict.fromkeys(map(ord, '!'), None))
 
+        if len(word_tokenize(contact_list(row['summary']), engine='newmm', keep_whitespace=False)) < 8:
+            continue
+
         output_df.loc[index, 'title'] = contact_list(row['title'])
         output_df.loc[index, 'body'] = contact_list(row['body'])
         output_df.loc[index, 'summary'] = contact_list(row['summary'])

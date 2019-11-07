@@ -1,7 +1,9 @@
 import pythainlp
 import pandas as pd
+import sys
 import os
-
+import tqdm
+from thai_segmenter import sentence_segment
 
 def get_abstractedness_score(article_set, summary_set):
     ab_score = 0
@@ -25,29 +27,32 @@ def human_format(num):
     return '%d%s' % (num, ['', 'K', 'M', 'G', 'T', 'P'][magnitude])
 
 
-path = 'E:\\Khun Projects\\Thairath_Crawler\\test_dataset\\cleaned_csv\\'
-file_name = 'thairath-250k.csv'
+path = 'E:\\Khun Projects\\Thairath_Crawler\\detail\\'
+file_name = 'thairath-228k.csv'
 thairath_df = pd.read_csv(path+file_name, encoding='utf-8')
 
 df_size = len(thairath_df)
 for index, row in thairath_df.iterrows():
 
-    if len(pythainlp.word_tokenize(row['summary'], engine='newmm', keep_whitespace=False)) < 5:
-        continue
+    # if len(pythainlp.word_tokenize(row['summary'], engine='newmm', keep_whitespace=False)) < 5:
+    #     continue
 
-    article_token = pythainlp.word_tokenize(row['body'], engine='newmm', keep_whitespace=False)
-    summary_token = pythainlp.word_tokenize(row['summary'], engine='newmm', keep_whitespace=False)
-    title_token = pythainlp.word_tokenize(row['title'], engine='newmm', keep_whitespace=False)
+    # article_token = pythainlp.word_tokenize(row['body'], engine='newmm', keep_whitespace=False)
+    # summary_token = pythainlp.word_tokenize(row['summary'], engine='newmm', keep_whitespace=False)
+    # title_token = pythainlp.word_tokenize(row['title'], engine='newmm', keep_whitespace=False)
 
-    thairath_df.loc[index, 'article_length'] = len(article_token)
-    thairath_df.loc[index, 'summary_length'] = len(summary_token)
-    thairath_df.loc[index, 'title_length'] = len(title_token)
+    article_sentences = sentence_segment(row['body'])
+    summary_sentences = sentence_segment(row['summary'])
 
-    thairath_df.loc[index, 'abstractedness_n1'] = get_abstractedness_score(set(article_token), set(summary_token))
+    # thairath_df.loc[index, 'article_length'] = len(article_token)
+    # thairath_df.loc[index, 'summary_length'] = len(summary_token)
+    # thairath_df.loc[index, 'title_length'] = len(title_token)
 
-    if thairath_df.loc[index, 'abstractedness_n1'] > 65:
-        thairath_df.drop(index, inplace=True)
-        continue
+    # thairath_df.loc[index, 'abstractedness_n1'] = get_abstractedness_score(set(article_token), set(summary_token))
+
+    # if thairath_df.loc[index, 'abstractedness_n1'] > 65:
+    #     thairath_df.drop(index, inplace=True)
+    #     continue
 
     # thairath_df.loc[index, 'abstractedness_n2'] = get_abstractedness_score(set(generate_ngrams(article_token, 2)),
     #                                                                        set(generate_ngrams(summary_token, 2)))
@@ -57,46 +62,62 @@ for index, row in thairath_df.iterrows():
     #                                                                        set(generate_ngrams(summary_token, 4)))
     # thairath_df.loc[index, 'abstractedness_n5'] = get_abstractedness_score(set(generate_ngrams(article_token, 5)),
     #                                                                        set(generate_ngrams(summary_token, 5)))
+
+    thairath_df.loc[index, 'abstractedness_sentence'] = get_abstractedness_score(set(article_sentences),
+                                                                                 set(summary_sentences))
+
+    file = open("thairath_sentence.txt", "a+", encoding="utf-8")
+    for article_sentence in article_sentences:
+        file.write(f'{article_sentence.content}\n')
+    for summary_sentence in summary_sentences:
+        file.write(f'{summary_sentence.content}\n')
+    file.close()
+
     percent = (index * 100) / df_size
-    print(index+1, " of ", df_size, " || ", percent)
+    sys.stdout.flush()
+    print(f"{index+1} of {df_size} || {percent}%")
 
-article_avg_size = thairath_df['article_length'].mean()
-summary_avg_size = thairath_df['summary_length'].mean()
-title_avg_size = thairath_df['title_length'].mean()
+# article_avg_size = thairath_df['article_length'].mean()
+# summary_avg_size = thairath_df['summary_length'].mean()
+# title_avg_size = thairath_df['title_length'].mean()
 
-abstract_avg_size = thairath_df['abstractedness_n1'].mean()
+# abstract_avg_size = thairath_df['abstractedness_n1'].mean()
 # abstract_avg_size_2 = thairath_df['abstractedness_n2'].mean()
 # abstract_avg_size_3 = thairath_df['abstractedness_n3'].mean()
 # abstract_avg_size_4 = thairath_df['abstractedness_n4'].mean()
 # abstract_avg_size_5 = thairath_df['abstractedness_n5'].mean()
+abstract_sentence_avg_size = thairath_df['abstractedness_sentence'].mean()
+
 
 print("\nDataset size : ", len(thairath_df))
-print("Title_avg_size : ", title_avg_size)
-print("Article_avg_size : ", article_avg_size)
-print("Summary_avg_size : ", summary_avg_size)
-print("Abstract_avg_size : ", abstract_avg_size)
+# print("Title_avg_size : ", title_avg_size)
+# print("Article_avg_size : ", article_avg_size)
+# print("Summary_avg_size : ", summary_avg_size)
+# print("Abstract_avg_size : ", abstract_avg_size)
 # print("Abstract_2_avg_size : ", abstract_avg_size_2)
 # print("Abstract_3_avg_size : ", abstract_avg_size_3)
 # print("Abstract_4_avg_size : ", abstract_avg_size_4)
 # print("Abstract_5_avg_size : ", abstract_avg_size_5)
+print("Abstract_sentence_avg_size : ", abstract_sentence_avg_size)
 
 
 subdirectory = "detail"
 
-file = open("thairath-"+human_format(len(thairath_df))+".txt", "w+")
+file = open(f"thairath- {human_format(len(thairath_df))}_sentence.txt", "w+")
 file.write("Dataset size : " + str(len(thairath_df)))
-file.write("\nTitle_avg_size : " + str(title_avg_size))
-file.write("\nArticle_avg_size : " + str(article_avg_size))
-file.write("\nSummary_avg_size : " + str(summary_avg_size))
+# file.write("\nTitle_avg_size : " + str(title_avg_size))
+# file.write("\nArticle_avg_size : " + str(article_avg_size))
+# file.write("\nSummary_avg_size : " + str(summary_avg_size))
 # file.write("\nAbstract_2_avg_size : " + str(abstract_avg_size_2))
 # file.write("\nAbstract_3_avg_size : " + str(abstract_avg_size_3))
 # file.write("\nAbstract_4_avg_size : " + str(abstract_avg_size_4))
 # file.write("\nAbstract_5_avg_size : " + str(abstract_avg_size_5))
+file.write("\nAbstract_sentence_avg_size : " + str(abstract_sentence_avg_size))
 file.close()
 
-try:
-    os.mkdir(subdirectory)
-except FileExistsError:
-    pass
-thairath_df.to_csv(os.path.join(subdirectory, "Published_" + file_name + ".csv"), index=False, encoding='utf-8-sig',
-                   columns=["title", "body", "summary", "tags"])
+# try:
+#     os.mkdir(subdirectory)
+# except FileExistsError:
+#     pass
+# thairath_df.to_csv(os.path.join(subdirectory, "Published_" + file_name + ".csv"), index=False, encoding='utf-8-sig',
+#                    columns=["title", "body", "summary", "tags"])

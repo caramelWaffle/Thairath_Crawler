@@ -11,7 +11,11 @@ import scrapy
 class ThairathSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     title = scrapy.Field()
-    summary = scrapy.Field()
+    url = scrapy.Field()
+    date = scrapy.Field()
+    meta_sum = scrapy.Field()
+    type = scrapy.Field()
+    article_sum = scrapy.Field()
     body = scrapy.Field()
     tags = scrapy.Field()
     pass

@@ -86,7 +86,7 @@ for index, row in thairath_df.iterrows():
 # abstract_avg_size_3 = thairath_df['abstractedness_n3'].mean()
 # abstract_avg_size_4 = thairath_df['abstractedness_n4'].mean()
 # abstract_avg_size_5 = thairath_df['abstractedness_n5'].mean()
-abstract_sentence_avg_size = thairath_df['abstractedness_sentence'].mean()
+# abstract_sentence_avg_size = thairath_df['abstractedness_sentence'].mean()
 
 
 print("\nDataset size : ", len(thairath_df))
@@ -98,7 +98,7 @@ print("\nDataset size : ", len(thairath_df))
 # print("Abstract_3_avg_size : ", abstract_avg_size_3)
 # print("Abstract_4_avg_size : ", abstract_avg_size_4)
 # print("Abstract_5_avg_size : ", abstract_avg_size_5)
-print("Abstract_sentence_avg_size : ", abstract_sentence_avg_size)
+# print("Abstract_sentence_avg_size : ", abstract_sentence_avg_size)
 
 
 subdirectory = "detail"

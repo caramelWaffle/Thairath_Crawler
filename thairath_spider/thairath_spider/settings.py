@@ -13,7 +13,7 @@ BOT_NAME = 'thairath_spider'
 
 SPIDER_MODULES = ['thairath_spider.spiders']
 NEWSPIDER_MODULE = 'thairath_spider.spiders'
-
+LOG_ENABLED = True
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'thairath_spider (+http://www.yourdomain.com)'
@@ -95,5 +95,5 @@ DOWNLOADER_MIDDLEWARES = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 # FEED_FORMAT="csv"
 # FEED_URI="thairath.csv"
-FEED_EXPORT_ENCODING = "utf-8"
-
+FEED_EXPORT_ENCODING = "utf-8-sig"
+FEED_EXPORT_FIELDS = ["title", "body", "article_sum", "meta_sum", "type", "tags", "url", "date"]
